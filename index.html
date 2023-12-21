@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wikipedia Viewer</title>
+</head>
+<body>
+  <h1>Wikipedia Viewer</h1>
+  <input type="text" id="searchInput" placeholder="Search Wikipedia">
+  <button onclick="searchWikipedia()">Search</button>
+  <button onclick="getRandomArticle()">Random Article</button>
+  <div id="results"></div>
+
+  <script>
+    function searchWikipedia() {
+      const searchTerm = document.getElementById('searchInput').value;
+      fetch(`https://cors-anywhere.herokuapp.com/https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchTerm}&format=json`, {
+        headers: {
+          'Origin': 'https://your-app-origin.com', // Ersetzen Sie dies durch den tatsächlichen Ursprung Ihrer App
+        },
+      })
+        .then(response => response.json())
+        .then(data => displayResults(data.query.search))
+        .catch(error => console.error('Fehler beim Abrufen der Suchergebnisse:', error));
+    }
+
+    function getRandomArticle() {
+      fetch('https://cors-anywhere.herokuapp.com/https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&format=json', {
+        headers: {
+          'Origin': 'https://your-app-origin.com', // Ersetzen Sie dies durch den tatsächlichen Ursprung Ihrer App
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          const randomTitle = data.query.random[0].title;
+          displayResults([{ title: randomTitle, snippet: 'Zufälliger Artikel' }]);
+        })
+        .catch(error => console.error('Fehler beim Abrufen des zufälligen Artikels:', error));
+    }
+
+    function displayResults(results) {
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '';
+
+      results.forEach(result => {
+        const resultElement = document.createElement('div');
+        resultElement.innerHTML = `<h3>${result.title}</h3><p>${result.snippet}</p>`;
+        resultsContainer.appendChild(resultElement);
+      });
+    }
+  </script>
+</body>
+</html>
